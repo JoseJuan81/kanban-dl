@@ -5,24 +5,22 @@
 </template>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+@import 'tailwindcss/utilities';
+
+html, body {
+	font-size: 62.5%;
+	margin: 0;
+	@apply bg-gray-400;
 }
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+#app {
+	color: #2c3e50;
+	font-family: Avenir, Helvetica, Arial, sans-serif;
+	text-align: center;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin: auto;
+	max-width: 144rem;
+	@apply text-xl font-semibold pt-10 px-10;
 }
 </style>

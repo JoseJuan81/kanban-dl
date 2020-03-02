@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'Board',
-    component: () => import(''),
+    component: () => import('@/views/Board.vue'),
   },
 ];
 

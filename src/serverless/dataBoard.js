@@ -1,4 +1,4 @@
-import { uuid } from '@/shared/utils.js';
+import { uuid } from '@/shared/utils';
 
 const columns = [
 	{
@@ -36,8 +36,8 @@ const columns = [
 				userAssigned: null,
 			},
 		],
-	 },
-	 {
+	},
+	{
 		name: 'Hecho',
 		id: `c-${uuid()}`,
 		tasks: [
@@ -48,7 +48,7 @@ const columns = [
 				userAssigned: null,
 			},
 		],
- 	}
+	},
 ];
 
 export default columns;

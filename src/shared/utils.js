@@ -1,3 +1,9 @@
 const uuid = () => Math.random().toString(32).slice(2);
 
-export { uuid };
+const saveStatePlugin = (store) => {
+	store.subscribe((mutation, state) => {
+		localStorage.setItem('board', JSON.stringify(state.board));
+	});
+};
+
+export { uuid, saveStatePlugin };
