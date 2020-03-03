@@ -1,5 +1,5 @@
 <template>
-  <div class="flex overflow-x-auto">
+  <div class="flex overflow-x-auto h-full">
     <div class="column-container" v-for="(column, indexCol) in board" :key="indexCol">
 		{{ column.name }}
 		<div>
@@ -26,6 +26,8 @@ export default {
 </script>
 <style lang="scss">
 .column-container {
+	height: fit-content;
+	min-width: 32rem;
 	@apply bg-gray-200 p-6 mx-4 w-1/3 text-left rounded-lg text-3xl;
 }
 </style>

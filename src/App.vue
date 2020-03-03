@@ -14,6 +14,7 @@ html, body {
 }
 
 #app {
+	box-sizing: border-box;
 	color: #2c3e50;
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	text-align: center;
@@ -21,6 +22,6 @@ html, body {
 	-moz-osx-font-smoothing: grayscale;
 	margin: auto;
 	max-width: 144rem;
-	@apply text-xl font-semibold pt-10 px-10;
+	@apply text-xl font-semibold pt-10 px-10 h-screen;
 }
 </style>

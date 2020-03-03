@@ -49,6 +49,18 @@ const columns = [
 			},
 		],
 	},
+	{
+		name: 'Revisado',
+		id: `c-${uuid()}`,
+		tasks: [
+			{
+				description: '',
+				id: uuid(),
+				name: 'sixth task',
+				userAssigned: null,
+			},
+		],
+	},
 ];
 
 export default columns;
