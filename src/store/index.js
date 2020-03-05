@@ -18,14 +18,22 @@ export default new Vuex.Store({
 				description: '',
 				id: uuid(),
 				name,
+				tags: [],
 				userAssigned: null,
 			};
 			tasks.push(newTask);
+		},
+		GRAGGING_TASK(state, { fromTasks, toTasks, fromIndexTask }) {
+			const taskToMove = fromTasks.splice(fromIndexTask, 1)[0];
+			toTasks.push(taskToMove);
 		},
 	},
 	actions: {
 		addNewTask({ commit }, { name, tasks }) {
 			commit('CREATE_NEW_TASK', { name, tasks });
+		},
+		moveTask({ commit }, { fromTasks, toTasks, fromIndexTask }) {
+			commit('GRAGGING_TASK', { fromTasks, toTasks, fromIndexTask });
 		},
 	},
 	modules: {
