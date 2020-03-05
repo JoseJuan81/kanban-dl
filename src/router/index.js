@@ -6,7 +6,7 @@ Vue.use(VueRouter);
 const routes = [
 	{
 		path: '/',
-		name: 'Board',
+		name: 'board',
 		component: () => import('@/views/Board.vue'),
 		children: [
 			{

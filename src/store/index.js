@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import dataBoard from '@/serverless/dataBoard';
-import { saveStatePlugin } from '@/shared/utils';
+import { saveStatePlugin, uuid } from '@/shared/utils';
 
 Vue.use(Vuex);
 
@@ -13,8 +13,20 @@ export default new Vuex.Store({
 		board,
 	},
 	mutations: {
+		CREATE_NEW_TASK(state, { name, tasks }) {
+			const newTask = {
+				description: '',
+				id: uuid(),
+				name,
+				userAssigned: null,
+			};
+			tasks.push(newTask);
+		},
 	},
 	actions: {
+		addNewTask({ commit }, { name, tasks }) {
+			commit('CREATE_NEW_TASK', { name, tasks });
+		},
 	},
 	modules: {
 	},
