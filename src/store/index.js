@@ -23,8 +23,13 @@ export default new Vuex.Store({
 			};
 			tasks.push(newTask);
 		},
-		GRAGGING_TASK(state, { fromTasks, toTasks, fromIndexTask }) {
-			const taskToMove = fromTasks.splice(fromIndexTask, 1)[0];
+		DRAGGING_COLUMN(state, { toColumnIndex, fromColumnIndex }) {
+			const { columns } = state.board;
+			const [fromColumn] = columns.splice(fromColumnIndex, 1);
+			columns.splice(toColumnIndex, 0, fromColumn);
+		},
+		DRAGGING_TASK(state, { fromTasks, toTasks, fromIndexTask }) {
+			const [taskToMove] = fromTasks.splice(fromIndexTask, 1);
 			toTasks.push(taskToMove);
 		},
 	},
@@ -32,8 +37,11 @@ export default new Vuex.Store({
 		addNewTask({ commit }, { name, tasks }) {
 			commit('CREATE_NEW_TASK', { name, tasks });
 		},
+		moveColumn({ commit }, { toColumnIndex, fromColumnIndex }) {
+			commit('DRAGGING_COLUMN', { toColumnIndex, fromColumnIndex });
+		},
 		moveTask({ commit }, { fromTasks, toTasks, fromIndexTask }) {
-			commit('GRAGGING_TASK', { fromTasks, toTasks, fromIndexTask });
+			commit('DRAGGING_TASK', { fromTasks, toTasks, fromIndexTask });
 		},
 	},
 	modules: {

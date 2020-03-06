@@ -1,10 +1,12 @@
 <template>
 	<div class="flex overflow-x-auto h-full">
 		<div
+			draggable
 			class="column-container"
 			v-for="(column, indexCol) in board.columns"
 			:key="indexCol"
-			@drop="dropping($event, column.tasks)"
+			@dragstart.self="pickUpColumn($event, indexCol)"
+			@drop="dropping($event, column.tasks, indexCol)"
 			@dragover.prevent
 			@dragenter.prevent
 		>
@@ -16,7 +18,7 @@
 					:key="indexTask"
 					class="bg-white p-4 rounded-lg my-4 text-xl"
 					@click="openTask(task)"
-					@dragstart="pickUp($event, indexTask, indexCol)"
+					@dragstart.self="pickUp($event, indexTask, indexCol)"
 				>
 					{{ task.name }}
 				</div>
@@ -61,9 +63,34 @@ function pickUp(e, indexTask, indexFromCol) {
 	e.dataTransfer.dropEffect = 'move';
 	e.dataTransfer.setData('from-task-index', indexTask);
 	e.dataTransfer.setData('from-col-index', indexFromCol);
+	e.dataTransfer.setData('type', 'task');
 }
 
-function dropping(e, toTasks) {
+function pickUpColumn(e, fromColumnIndex) {
+	e.dataTransfer.effectAllowed = 'move';
+	e.dataTransfer.dropEffect = 'move';
+	e.dataTransfer.setData('from-col-index', fromColumnIndex);
+	e.dataTransfer.setData('type', 'column');
+}
+
+function dropping(e, toTasks, toColumnIndex) {
+	const type = e.dataTransfer.getData('type');
+	if (type === 'task') {
+		this.dropTask(e, toTasks);
+	} else {
+		this.dropColumn(e, toColumnIndex);
+	}
+}
+
+function dropColumn(e, toColumnIndex) {
+	const fromColumnIndex = e.dataTransfer.getData('from-col-index');
+	this.$store.dispatch('moveColumn', {
+		toColumnIndex,
+		fromColumnIndex,
+	});
+}
+
+function dropTask(e, toTasks) {
 	const fromIndexTask = e.dataTransfer.getData('from-task-index');
 	const fromIndexCol = e.dataTransfer.getData('from-col-index');
 	const fromTasks = this.board.columns[fromIndexCol].tasks;
@@ -84,7 +111,10 @@ export default {
 		addTask,
 		closeTask,
 		dropping,
+		dropColumn,
+		dropTask,
 		pickUp,
+		pickUpColumn,
 		openTask,
 	},
 };
