@@ -7,6 +7,15 @@
 			:column="column"
 			:index-col="indexCol"
 		/>
+		<div class="column-container">
+			<input
+				class="add-task-input"
+				placeholder="+ Nueva Columna"
+				ref="new-column-input"
+				@keyup.enter="addNewColumn"
+				v-model="newColumnName"
+			>
+		</div>
 		<div class="modal-task-container" v-if="isTaskOpen" @click.self="closeTask">
 			<router-view name="task"></router-view>
 		</div>
@@ -24,6 +33,17 @@ function closeTask() {
 	this.$router.push({ name: 'board' });
 }
 
+function addNewColumn() {
+	this.$store.dispatch('addNewColumn', { name: this.newColumnName });
+	this.newColumnName = '';
+}
+
+function data() {
+	return {
+		newColumnName: '',
+	};
+}
+
 export default {
 	name: 'board',
 	components: {
@@ -33,7 +53,9 @@ export default {
 		...mapState(['board']),
 		isTaskOpen,
 	},
+	data,
 	methods: {
+		addNewColumn,
 		closeTask,
 	},
 };

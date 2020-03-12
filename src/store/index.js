@@ -13,6 +13,13 @@ export default new Vuex.Store({
 		board,
 	},
 	mutations: {
+		CREATE_NEW_COLUMN(state, { name }) {
+			state.board.columns.push({
+				name,
+				id: `c-${uuid()}`,
+				tasks: [],
+			});
+		},
 		CREATE_NEW_TASK(state, { name, tasks }) {
 			const newTask = {
 				description: '',
@@ -34,6 +41,9 @@ export default new Vuex.Store({
 		},
 	},
 	actions: {
+		addNewColumn({ commit }, { name }) {
+			commit('CREATE_NEW_COLUMN', { name });
+		},
 		addNewTask({ commit }, { name, tasks }) {
 			commit('CREATE_NEW_TASK', { name, tasks });
 		},
