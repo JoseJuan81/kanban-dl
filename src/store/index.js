@@ -40,6 +40,10 @@ export default new Vuex.Store({
 			const [taskToMove] = fromTasks.splice(fromTaskIndex, 1);
 			toTasks.splice(toTaskIndex, 0, taskToMove);
 		},
+		DROP_COLUMN(state, { columns, fromIndexColumn, toIndexColumn }) {
+			const column = columns.splice(fromIndexColumn, 1)[0];
+			columns.splice(toIndexColumn, 0, column);
+		},
 	},
 	actions: {
 		addNewColumn({ commit }, { name }) {
@@ -47,6 +51,9 @@ export default new Vuex.Store({
 		},
 		addNewTask({ commit }, { name, tasks }) {
 			commit('CREATE_NEW_TASK', { name, tasks });
+		},
+		dropColumnAction({ commit }, { columns, fromIndexColumn, toIndexColumn }) {
+			commit('DROP_COLUMN', { columns, fromIndexColumn, toIndexColumn });
 		},
 		moveColumn({ commit }, { toColumnIndex, fromColumnIndex }) {
 			commit('DRAGGING_COLUMN', { toColumnIndex, fromColumnIndex });

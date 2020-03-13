@@ -5,6 +5,10 @@
 			class="column-item"
 			v-for="(column, indexColumn) in columns"
 			:key="indexColumn"
+			@dragstart="moveColumn($event, indexColumn)"
+			@drop="dropColumn($event, indexColumn)"
+			@dragenter.prevent
+			@dragover.prevent
 		>
 			<slot :column="column"></slot>
 		</div>
@@ -13,8 +17,22 @@
 		</div>
 	</div>
 </template>
-
 <script>
+
+function moveColumn(e, indexColumn) {
+	e.dataTransfer.effectAllowed = 'move';
+	e.dataTransfer.dropEffect = 'move';
+	e.dataTransfer.setData('from-column-index', JSON.stringify(indexColumn));
+}
+
+function dropColumn(e, toIndexColumn) {
+	const fromIndexColumn = e.dataTransfer.getData('from-column-index');
+	this.$store.dispatch('dropColumnAction', {
+		columns: this.columns,
+		fromIndexColumn,
+		toIndexColumn,
+	});
+}
 
 function isTask() {
 	return this.$route.name === 'task';
@@ -31,6 +49,8 @@ export default {
 	},
 	methods: {
 		closeTask,
+		moveColumn,
+		dropColumn,
 	},
 	props: {
 		columns: {
