@@ -1,39 +1,20 @@
 <template>
 	<div class="flex overflow-x-auto h-full">
-		<div
-			draggable
-			class="column-container"
+		<Board-Column
 			v-for="(column, indexCol) in board.columns"
 			:key="indexCol"
-			@dragstart.self="pickUpColumn($event, indexCol)"
-			@drop="dropping($event, column.tasks, indexCol)"
-			@dragover.prevent
-			@dragenter.prevent
-		>
-			{{ column.name }}
-			<div>
-				<div
-					draggable
-					v-for="(task, indexTask) in column.tasks"
-					:key="indexTask"
-					class="bg-white p-4 rounded-lg my-4 text-xl"
-					@click="openTask(task)"
-					@dragstart.self="pickUp($event, indexTask, indexCol)"
-					@drop.stop="dropping($event, column.tasks, indexCol, indexTask)"
-					@dragover.prevent
-					@dragenter.prevent
-				>
-					{{ task.name }}
-				</div>
-			</div>
+			:board="board"
+			:column="column"
+			:index-col="indexCol"
+		/>
+		<div class="column-container">
 			<input
-				type="text"
-				name="add-task"
-				class="add-task-input focus:outline-none"
-				placeholder="+ nueva tarea"
-				:ref="`add-new-task-input-${indexCol}`"
-				@keyup.enter="addTask(indexCol, $event, column.tasks)"
-			/>
+				class="add-task-input"
+				placeholder="+ Nueva Columna"
+				ref="new-column-input"
+				@keyup.enter="addNewColumn"
+				v-model="newColumnName"
+			>
 		</div>
 		<div class="modal-task-container" v-if="isTaskOpen" @click.self="closeTask">
 			<router-view name="task"></router-view>
@@ -42,6 +23,7 @@
 </template>
 <script>
 import { mapState } from 'vuex';
+import BoardColumn from '@/components/BoardColumns.vue';
 
 function isTaskOpen() {
 	return this.$route.name === 'task';
@@ -51,10 +33,12 @@ function closeTask() {
 	this.$router.push({ name: 'board' });
 }
 
-function openTask({ id }) {
-	this.$router.push({ name: 'task', params: { id } });
+function addNewColumn() {
+	this.$store.dispatch('addNewColumn', { name: this.newColumnName });
+	this.newColumnName = '';
 }
 
+<<<<<<< HEAD
 function addTask(index, event, tasks) {
 	const { value } = event.target;
 	this.$store.dispatch('addNewTask', { name: value, tasks });
@@ -103,23 +87,27 @@ function dropTask(e, toTasks, toTaskIndex) {
 		toTasks,
 		toTaskIndex,
 	});
+=======
+function data() {
+	return {
+		newColumnName: '',
+	};
+>>>>>>> 3202e49010ff0cdc6057cb36941c72362b11ad44
 }
 
 export default {
 	name: 'board',
+	components: {
+		BoardColumn,
+	},
 	computed: {
 		...mapState(['board']),
 		isTaskOpen,
 	},
+	data,
 	methods: {
-		addTask,
+		addNewColumn,
 		closeTask,
-		dropping,
-		dropColumn,
-		dropTask,
-		pickUp,
-		pickUpColumn,
-		openTask,
 	},
 };
 </script>
