@@ -8,15 +8,22 @@ const routes = [
 		path: '/',
 		name: 'app',
 		component: () => import('@/App.vue'),
-		children: [
-			{
-				path: 'task/:id',
-				name: 'task',
-				components: {
-					task: () => import('@/views/Task.vue'),
-				},
-			},
-		],
+		// children: [
+		// 	{
+		// 		path: 'task/:id',
+		// 		name: 'task',
+		// 		components: {
+		// 			task: () => import('@/views/Task.vue'),
+		// 		},
+		// 	},
+		// ],
+	},
+	{
+		path: '/task/:id',
+		name: 'kan-task-detail',
+		components: {
+			taskDetail: () => import('@/views/Task.vue'),
+		},
 	},
 ];
 

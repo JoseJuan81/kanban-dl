@@ -38,7 +38,6 @@ function addNewColumn() {
 	this.newColumnName = '';
 }
 
-<<<<<<< HEAD
 function addTask(index, event, tasks) {
 	const { value } = event.target;
 	this.$store.dispatch('addNewTask', { name: value, tasks });
@@ -87,12 +86,12 @@ function dropTask(e, toTasks, toTaskIndex) {
 		toTasks,
 		toTaskIndex,
 	});
-=======
+}
+
 function data() {
 	return {
 		newColumnName: '',
 	};
->>>>>>> 3202e49010ff0cdc6057cb36941c72362b11ad44
 }
 
 export default {

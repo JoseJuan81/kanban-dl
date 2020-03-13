@@ -7,7 +7,10 @@
 				:column-title="column.name"
 				:column="column"
 			>
-				<KanTask class="task hover:shadow-lg hover:scale-105">
+				<KanTask
+					class="task hover:shadow-lg hover:scale-105"
+					@click="showTask(task)"
+				>
 					{{task.name}}
 				</KanTask>
 			</KanColumn>
@@ -19,7 +22,6 @@ import { mapState } from 'vuex';
 import KanBoard from '@/components/kanBoard.vue';
 import KanColumn from '@/components/kanColumn.vue';
 import KanTask from '@/components/kanTask.vue';
-
 
 export default {
 	name: 'App',
@@ -62,7 +64,7 @@ html, body {
 }
 
 .task {
-	transition: all 150ms ease-in-out;
+	transition: all 100ms ease-in-out;
 	@apply bg-white p-4 rounded-lg my-4 text-xl transform scale-100;
 }
 </style>
