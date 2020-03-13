@@ -19,6 +19,9 @@
 					class="bg-white p-4 rounded-lg my-4 text-xl"
 					@click="openTask(task)"
 					@dragstart.self="pickUp($event, indexTask, indexCol)"
+					@drop.stop="dropping($event, column.tasks, indexCol, indexTask)"
+					@dragover.prevent
+					@dragenter.prevent
 				>
 					{{ task.name }}
 				</div>
@@ -26,7 +29,7 @@
 			<input
 				type="text"
 				name="add-task"
-				class="add-task-input"
+				class="add-task-input focus:outline-none"
 				placeholder="+ nueva tarea"
 				:ref="`add-new-task-input-${indexCol}`"
 				@keyup.enter="addTask(indexCol, $event, column.tasks)"
@@ -73,10 +76,10 @@ function pickUpColumn(e, fromColumnIndex) {
 	e.dataTransfer.setData('type', 'column');
 }
 
-function dropping(e, toTasks, toColumnIndex) {
+function dropping(e, toTasks, toColumnIndex, toTaskIndex) {
 	const type = e.dataTransfer.getData('type');
 	if (type === 'task') {
-		this.dropTask(e, toTasks);
+		this.dropTask(e, toTasks, toTaskIndex, toTaskIndex !== undefined ? toTasks : toTasks.length);
 	} else {
 		this.dropColumn(e, toColumnIndex);
 	}
@@ -90,14 +93,15 @@ function dropColumn(e, toColumnIndex) {
 	});
 }
 
-function dropTask(e, toTasks) {
-	const fromIndexTask = e.dataTransfer.getData('from-task-index');
-	const fromIndexCol = e.dataTransfer.getData('from-col-index');
-	const fromTasks = this.board.columns[fromIndexCol].tasks;
+function dropTask(e, toTasks, toTaskIndex) {
+	const fromTaskIndex = e.dataTransfer.getData('from-task-index');
+	const fromColIndex = e.dataTransfer.getData('from-col-index');
+	const fromTasks = this.board.columns[fromColIndex].tasks;
 	this.$store.dispatch('moveTask', {
 		fromTasks,
+		fromTaskIndex,
 		toTasks,
-		fromIndexTask,
+		toTaskIndex,
 	});
 }
 
@@ -120,11 +124,6 @@ export default {
 };
 </script>
 <style lang="scss">
-.column-container {
-	height: max-content;
-	min-width: 32rem;
-	@apply bg-gray-200 p-6 mx-4 w-1/3 text-left rounded-lg text-3xl;
-}
 
 .modal-task-container {
 	background-color: #2d3748b3;

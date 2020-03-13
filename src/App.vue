@@ -1,9 +1,33 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+	<div id="app">
+		<KanBoard :columns="board.columns" v-slot="{ column }">
+			<KanColumn v-slot="{ task }" :column-title="column.name" :column="column">
+				<KanTask>
+					{{task.name}}
+				</KanTask>
+			</KanColumn>
+		</KanBoard>
+	</div>
 </template>
+<script>
+import { mapState } from 'vuex';
+import KanBoard from '@/components/kanBoard.vue';
+import KanColumn from '@/components/kanColumn.vue';
+import KanTask from '@/components/kanTask.vue';
 
+
+export default {
+	name: 'App',
+	components: {
+		KanBoard,
+		KanColumn,
+		KanTask,
+	},
+	computed: {
+		...mapState(['board']),
+	},
+};
+</script>
 <style lang="scss">
 @import 'tailwindcss/utilities';
 

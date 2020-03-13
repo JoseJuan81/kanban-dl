@@ -6,8 +6,8 @@ Vue.use(VueRouter);
 const routes = [
 	{
 		path: '/',
-		name: 'board',
-		component: () => import('@/views/Board.vue'),
+		name: 'app',
+		component: () => import('@/App.vue'),
 		children: [
 			{
 				path: 'task/:id',

@@ -28,9 +28,10 @@ export default new Vuex.Store({
 			const [fromColumn] = columns.splice(fromColumnIndex, 1);
 			columns.splice(toColumnIndex, 0, fromColumn);
 		},
-		DRAGGING_TASK(state, { fromTasks, toTasks, fromIndexTask }) {
-			const [taskToMove] = fromTasks.splice(fromIndexTask, 1);
-			toTasks.push(taskToMove);
+		/* eslint-disable object-curly-newline */
+		DRAGGING_TASK(state, { fromTasks, toTasks, fromTaskIndex, toTaskIndex }) {
+			const [taskToMove] = fromTasks.splice(fromTaskIndex, 1);
+			toTasks.splice(toTaskIndex, 0, taskToMove);
 		},
 	},
 	actions: {
@@ -40,8 +41,8 @@ export default new Vuex.Store({
 		moveColumn({ commit }, { toColumnIndex, fromColumnIndex }) {
 			commit('DRAGGING_COLUMN', { toColumnIndex, fromColumnIndex });
 		},
-		moveTask({ commit }, { fromTasks, toTasks, fromIndexTask }) {
-			commit('DRAGGING_TASK', { fromTasks, toTasks, fromIndexTask });
+		moveTask({ commit }, { fromTasks, toTasks, fromTaskIndex, toTaskIndex }) {
+			commit('DRAGGING_TASK', { fromTasks, toTasks, fromTaskIndex, toTaskIndex });
 		},
 	},
 	modules: {
