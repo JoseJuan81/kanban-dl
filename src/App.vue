@@ -1,8 +1,13 @@
 <template>
 	<div id="app">
 		<KanBoard :columns="board.columns" v-slot="{ column }">
-			<KanColumn v-slot="{ task }" :column-title="column.name" :column="column">
-				<KanTask>
+			<KanColumn
+				class="column"
+				v-slot="{ task }"
+				:column-title="column.name"
+				:column="column"
+			>
+				<KanTask class="task hover:shadow-lg hover:scale-105">
 					{{task.name}}
 				</KanTask>
 			</KanColumn>
@@ -47,5 +52,17 @@ html, body {
 	margin: auto;
 	max-width: 144rem;
 	@apply text-xl font-semibold pt-10 px-10 h-screen;
+}
+
+.column {
+
+	h3 {
+		@apply my-0 text-3xl;
+	}
+}
+
+.task {
+	transition: all 150ms ease-in-out;
+	@apply bg-white p-4 rounded-lg my-4 text-xl transform scale-100;
 }
 </style>
