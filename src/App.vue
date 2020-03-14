@@ -1,11 +1,11 @@
 <template>
 	<div id="app">
-		<KanBoard :columns="board.columns" v-slot="{ column }">
+		<KanBoard :columns="board.columns" v-slot="{ column, indexColumn }">
 			<KanColumn
 				class="column"
 				v-slot="{ task }"
-				:column-title="column.name"
 				:column="column"
+				:index-column="indexColumn"
 			>
 				<KanTask
 					class="task hover:shadow-lg hover:scale-105"
