@@ -604,14 +604,14 @@ __vue_render__$1._withStripped = true;
   );
 
 function install(Vue) {
-    if (install.installed) { return; }
+	if (install.installed) { return; }
 	install.installed = true;
 	Vue.component('kan-board', __vue_component__$1);
 	Vue.component('kan-column', __vue_component__);
 }
 
 var plugin = {
-    install: install,
+	install: install,
 };
 
 var GlobalVue = null;
@@ -623,8 +623,6 @@ if (typeof window !== 'undefined') {
 if (GlobalVue) {
 	GlobalVue.use(plugin);
 }
+// export default { kanBoard, kanColumn };
 
-var wrapper = { kanBoard: __vue_component__$1, kanColumn: __vue_component__ };
-
-export default wrapper;
-export { install };
+export { install, __vue_component__$1 as kanBoard, __vue_component__ as kanColumn };
