@@ -22,5 +22,6 @@ if (GlobalVue) {
 	GlobalVue.use(plugin);
 }
 
-export { kanBoard, kanColumn };
+export { kanColumn };
+export { kanBoard };
 export default { kanBoard, kanColumn };
