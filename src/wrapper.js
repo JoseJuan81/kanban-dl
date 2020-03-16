@@ -2,14 +2,14 @@ import kanColumn from './components/kanColumn.vue';
 import kanBoard from './components/kanBoard.vue';
 
 export function install(Vue) {
-    if (install.installed) return;
+	if (install.installed) return;
 	install.installed = true;
 	Vue.component('kan-board', kanBoard);
 	Vue.component('kan-column', kanColumn);
 }
 
 const plugin = {
-    install,
+	install,
 };
 
 let GlobalVue = null;
@@ -22,4 +22,5 @@ if (GlobalVue) {
 	GlobalVue.use(plugin);
 }
 
+export { kanBoard, kanColumn };
 export default { kanBoard, kanColumn };
