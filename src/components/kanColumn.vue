@@ -43,7 +43,6 @@ function addTask() {
 }
 
 function moveTask(e, fromTaskIndex) {
-	console.log('move task');
 	e.dataTransfer.effectAllowed = 'move';
 	e.dataTransfer.dropEffect = 'move';
 	e.dataTransfer.setData('from-task-index', fromTaskIndex);
@@ -52,7 +51,6 @@ function moveTask(e, fromTaskIndex) {
 }
 
 function dropTask(e, toTasks, toTaskIndex) {
-	console.log('drop task');
 	const fromTaskIndex = e.dataTransfer.getData('from-task-index');
 	this.$store.dispatch('dropTaskAction', {
 		fromTaskIndex,

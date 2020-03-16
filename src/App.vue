@@ -41,7 +41,7 @@ export default {
 html, body {
 	font-size: 62.5%;
 	margin: 0;
-	@apply bg-gray-400;
+	@apply bg-gray-100;
 }
 
 #app {
@@ -54,13 +54,6 @@ html, body {
 	margin: auto;
 	max-width: 144rem;
 	@apply text-xl font-semibold pt-10 px-10 h-screen;
-}
-
-.column {
-
-	h3 {
-		@apply my-0 text-3xl;
-	}
 }
 
 .task {

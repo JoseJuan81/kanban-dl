@@ -31,7 +31,6 @@
 <script>
 
 function moveColumn(e, indexColumn) {
-	console.log('move column');
 	e.dataTransfer.effectAllowed = 'move';
 	e.dataTransfer.dropEffect = 'move';
 	e.dataTransfer.setData('from-column-index', JSON.stringify(indexColumn));
@@ -41,7 +40,6 @@ function moveColumn(e, indexColumn) {
 function dropColumn(e, toIndexColumn) {
 	const type = e.dataTransfer.getData('type');
 	if (type === 'column') {
-		console.log('drop column');
 		const fromIndexColumn = e.dataTransfer.getData('from-column-index');
 		this.$store.dispatch('dropColumnAction', {
 			columns: this.columns,
@@ -113,7 +111,7 @@ export default {
 .column-item {
 	height: max-content;
 	min-width: 31rem;
-	@apply bg-gray-200 p-6 mx-4 text-left rounded-lg text-3xl;
+	@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;
 }
 
 .add-column-input {
