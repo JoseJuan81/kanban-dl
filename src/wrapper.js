@@ -24,4 +24,4 @@ if (GlobalVue) {
 
 export { kanColumn };
 export { kanBoard };
-export default { kanBoard, kanColumn };
+// export default { kanBoard, kanColumn };
