@@ -1,13 +1,10 @@
 <template>
 	<div>
-		<div class="mb-4 flex flex-start">
-			<slot name="newColumn" :addNewColumn="addNewColumn"></slot>
-		</div>
 		<div class="board-container">
 			<div
 				draggable
 				class="column-item"
-				v-for="(column, indexColumn) in value"
+				v-for="(column, indexColumn) in columns"
 				:key="indexColumn"
 				@dragstart="moveColumn($event, indexColumn)"
 				@drop="dropColumn($event, indexColumn)"
@@ -43,18 +40,18 @@ function dropColumn(e, toIndexColumn) {
 function updateTasks(e, toIndexColumn) {
 	const fromIndexTask = e.dataTransfer.getData('from-task-index');
 	const fromIndexColumn = e.dataTransfer.getData('from-column-index');
-	const toTasks = this.value[toIndexColumn].tasks;
-	const { tasks } = this.value[fromIndexColumn];
+	const toTasks = this.columns[toIndexColumn].tasks;
+	const { tasks } = this.columns[fromIndexColumn];
 	const task = tasks.splice(fromIndexTask, 1)[0];
 	toTasks.push(task);
-	this.emitColumns(this.value);
+	this.emitColumns(this.columns);
 }
 
 function updateColumns(e, toIndexColumn) {
 	const fromIndexColumn = e.dataTransfer.getData('from-column-index');
-	const column = this.value.splice(fromIndexColumn, 1)[0];
-	this.value.splice(toIndexColumn, 0, column);
-	this.emitColumns(this.value);
+	const column = this.columns.splice(fromIndexColumn, 1)[0];
+	this.columns.splice(toIndexColumn, 0, column);
+	this.emitColumns(this.columns);
 }
 
 function isTask() {
@@ -65,12 +62,8 @@ function closeTask() {
 	this.$router.push({ name: 'app' });
 }
 
-function addNewColumn(newColumn) {
-	this.emitColumns(this.value.concat(newColumn));
-}
-
 function emitColumns(columns) {
-	this.$emit('input', columns);
+	this.$emit('update-columns', columns);
 }
 
 export default {
@@ -79,7 +72,6 @@ export default {
 		isTask,
 	},
 	methods: {
-		addNewColumn,
 		closeTask,
 		dropColumn,
 		emitColumns,
@@ -88,7 +80,10 @@ export default {
 		updateTasks,
 	},
 	props: {
-		value: null,
+		columns: {
+			type: Array,
+			required: true,
+		},
 	},
 };
 </script>

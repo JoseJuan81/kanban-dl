@@ -1,27 +1,32 @@
 <template>
 	<div id="app">
-		<KanBoard v-model="columns">
-			<template v-slot:newColumn="{ addNewColumn }">
-				<input
-					class="add-column-input focus:outline-none"
-					placeholder="+ Nueva Columna"
-					@keyup.enter="addNewColumnAction(addNewColumn)"
-					v-model="newColumnName"
-				>
-			</template>
+		<div class="flex justify-start mb-4">
+			<input
+				class="add-column-input focus:outline-none"
+				placeholder="+ Nueva Columna"
+				@keyup.enter="addNewColumnAction"
+				v-model="newColumnName"
+			>
+		</div>
+		<KanBoard :columns="columns" @update-columns="updateColumns">
 			<template v-slot:column="{ column, indexColumn }">
 				<KanColumn
 					class="column"
 					:column="column"
+					:columns="columns"
 					:index-column="indexColumn"
-					v-slot:task="{ task }"
+					:default-task="{}"
+					@new-task="updateTasks"
+					@update-tasks="updateTasks"
 				>
-					<KanTask
-						class="task hover:shadow-lg hover:scale-105"
-						@click="showTask(task)"
-					>
-						{{task.name}}
-					</KanTask>
+					<template v-slot:task="{ task }">
+						<KanTask
+							class="task hover:shadow-lg hover:scale-105"
+							@click="showTask(task)"
+						>
+							{{task.name}}
+						</KanTask>
+					</template>
 				</KanColumn>
 			</template>
 		</KanBoard>
@@ -33,20 +38,30 @@ import KanColumn from '@/components/kanColumn.vue';
 import KanTask from '@/components/kanTask.vue';
 import { uuid } from '@/shared/utils';
 
-function addNewColumnAction(addNewColumn) {
+function addNewColumnAction() {
 	const newColumn = {
 		name: this.newColumnName,
 		id: `c-${uuid()}`,
 		tasks: [],
 	};
-	addNewColumn(newColumn);
+	this.columns = this.columns.concat(newColumn);
 	this.newColumnName = '';
+}
+
+function updateColumns(newColumns) {
+	this.columns = [].concat(newColumns);
+}
+
+function updateTasks({ tasks, indexColumn }) {
+	this.columns[indexColumn].tasks = [].concat(tasks);
+	this.updateColumns(this.columns);
 }
 
 function data() {
 	return {
 		columns: this.$store.state.board.columns,
 		newColumnName: '',
+		newTaskName: '',
 	};
 }
 
@@ -60,6 +75,8 @@ export default {
 	data,
 	methods: {
 		addNewColumnAction,
+		updateColumns,
+		updateTasks,
 	},
 };
 </script>

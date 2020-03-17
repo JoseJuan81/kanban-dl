@@ -23,7 +23,7 @@
 			name="add-task"
 			class="add-task-input focus:outline-none"
 			placeholder="+ nueva tarea"
-			v-model="newTask"
+			v-model="newTaskName"
 			@keyup.enter="addTask"
 		/>
 	</div>
@@ -35,11 +35,12 @@ function showTask({ id }) {
 }
 
 function addTask() {
-	this.$store.dispatch('addNewTask', {
-		name: this.newTask,
-		tasks: this.column.tasks,
+	const task = Object.assign(this.defaultTask, { name: this.newTaskName });
+	this.$emit('new-task', {
+		tasks: this.column.tasks.concat(task),
+		indexColumn: this.indexColumn,
 	});
-	this.newTask = '';
+	this.newTaskName = '';
 }
 
 function moveTask(e, fromTaskIndex) {
@@ -52,12 +53,15 @@ function moveTask(e, fromTaskIndex) {
 
 function dropTask(e, toTasks, toTaskIndex) {
 	const fromTaskIndex = e.dataTransfer.getData('from-task-index');
-	this.$store.dispatch('dropTaskAction', {
-		fromTaskIndex,
-		fromColumnIndex: this.indexColumn,
-		toTaskIndex,
-		toTasks,
-	});
+	const fromColumnIndex = e.dataTransfer.getData('from-column-index');
+	const fromTasks = this.columns[fromColumnIndex].tasks;
+	const task = fromTasks.splice(fromTaskIndex, 1)[0];
+	toTasks.splice(toTaskIndex, 0, task);
+	this.updateTasks(toTasks, this.indexColumn);
+}
+
+function updateTasks(tasks, indexColumn) {
+	this.$emit('update-tasks', { tasks, indexColumn });
 }
 
 function updateColumnName() {
@@ -69,7 +73,7 @@ function updateColumnName() {
 
 function data() {
 	return {
-		newTask: '',
+		newTaskName: '',
 	};
 }
 
@@ -82,14 +86,23 @@ export default {
 		moveTask,
 		showTask,
 		updateColumnName,
+		updateTasks,
 	},
 	props: {
 		column: {
 			type: Object,
 			required: true,
 		},
+		columns: {
+			type: Array,
+			required: true,
+		},
 		indexColumn: {
 			type: Number,
+			required: true,
+		},
+		defaultTask: {
+			type: Object,
 			required: true,
 		},
 	},
