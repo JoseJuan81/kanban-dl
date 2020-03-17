@@ -1,27 +1,54 @@
 <template>
 	<div id="app">
-		<KanBoard :columns="board.columns" v-slot="{ column, indexColumn }">
-			<KanColumn
-				class="column"
-				v-slot="{ task }"
-				:column="column"
-				:index-column="indexColumn"
-			>
-				<KanTask
-					class="task hover:shadow-lg hover:scale-105"
-					@click="showTask(task)"
+		<KanBoard v-model="columns">
+			<template v-slot:newColumn="{ addNewColumn }">
+				<input
+					class="add-column-input focus:outline-none"
+					placeholder="+ Nueva Columna"
+					@keyup.enter="addNewColumnAction(addNewColumn)"
+					v-model="newColumnName"
 				>
-					{{task.name}}
-				</KanTask>
-			</KanColumn>
+			</template>
+			<template v-slot:column="{ column, indexColumn }">
+				<KanColumn
+					class="column"
+					:column="column"
+					:index-column="indexColumn"
+					v-slot:task="{ task }"
+				>
+					<KanTask
+						class="task hover:shadow-lg hover:scale-105"
+						@click="showTask(task)"
+					>
+						{{task.name}}
+					</KanTask>
+				</KanColumn>
+			</template>
 		</KanBoard>
 	</div>
 </template>
 <script>
-import { mapState } from 'vuex';
 import KanBoard from '@/components/kanBoard.vue';
 import KanColumn from '@/components/kanColumn.vue';
 import KanTask from '@/components/kanTask.vue';
+import { uuid } from '@/shared/utils';
+
+function addNewColumnAction(addNewColumn) {
+	const newColumn = {
+		name: this.newColumnName,
+		id: `c-${uuid()}`,
+		tasks: [],
+	};
+	addNewColumn(newColumn);
+	this.newColumnName = '';
+}
+
+function data() {
+	return {
+		columns: this.$store.state.board.columns,
+		newColumnName: '',
+	};
+}
 
 export default {
 	name: 'App',
@@ -30,8 +57,9 @@ export default {
 		KanColumn,
 		KanTask,
 	},
-	computed: {
-		...mapState(['board']),
+	data,
+	methods: {
+		addNewColumnAction,
 	},
 };
 </script>
@@ -59,5 +87,16 @@ html, body {
 .task {
 	transition: all 100ms ease-in-out;
 	@apply bg-white p-4 rounded-lg my-4 text-xl transform scale-100;
+}
+
+.add-column-input {
+	@apply  bg-blue-600 border-0 p-2 px-4 py-4 text-white rounded-lg mx-4;
+}
+
+.add-column-input::placeholder {
+	@apply text-white;
+}
+.add-column-input:hover {
+	filter: brightness(1.1);
 }
 </style>

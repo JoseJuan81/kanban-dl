@@ -16,7 +16,7 @@
 			@dragenter.prevent
 			@dragover.prevent
 		>
-			<slot :task="task"/>
+			<slot name="task" :task="task"/>
 		</div>
 		<input
 			type="text"

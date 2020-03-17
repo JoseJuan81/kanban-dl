@@ -13,11 +13,11 @@ export default new Vuex.Store({
 		board,
 	},
 	mutations: {
-		ADD_FIRST_TASK(state, { fromIndexColumn, fromIndexTask, toTasks }) {
-			const { tasks } = state.board.columns[fromIndexColumn];
-			const task = tasks.splice(fromIndexTask, 1)[0];
-			toTasks.push(task);
-		},
+		// ADD_FIRST_TASK(state, { fromIndexColumn, fromIndexTask, toTasks }) {
+		// 	const { tasks } = state.board.columns[fromIndexColumn];
+		// 	const task = tasks.splice(fromIndexTask, 1)[0];
+		// 	toTasks.push(task);
+		// },
 		CREATE_NEW_COLUMN(state, { name }) {
 			state.board.columns.push({
 				name,
@@ -66,15 +66,15 @@ export default new Vuex.Store({
 		addNewTask({ commit }, { name, tasks }) {
 			commit('CREATE_NEW_TASK', { name, tasks });
 		},
-		dropColumnAction({ commit }, { columns, fromIndexColumn, toIndexColumn }) {
-			commit('DROP_COLUMN', { columns, fromIndexColumn, toIndexColumn });
-		},
+		// dropColumnAction({ commit }, { columns, fromIndexColumn, toIndexColumn }) {
+		// 	commit('DROP_COLUMN', { columns, fromIndexColumn, toIndexColumn });
+		// },
 		dropTaskAction({ commit }, { fromColumnIndex, fromTaskIndex, toTaskIndex, toTasks }) {
 			commit('DROP_TASK', { fromColumnIndex, fromTaskIndex, toTaskIndex, toTasks });
 		},
-		firstTask({ commit }, { fromIndexColumn, fromIndexTask, toTasks }) {
-			commit('ADD_FIRST_TASK', { fromIndexColumn, fromIndexTask, toTasks });
-		},
+		// firstTask({ commit }, { fromIndexColumn, fromIndexTask, toTasks }) {
+		// 	commit('ADD_FIRST_TASK', { fromIndexColumn, fromIndexTask, toTasks });
+		// },
 		moveColumn({ commit }, { toColumnIndex, fromColumnIndex }) {
 			commit('DRAGGING_COLUMN', { toColumnIndex, fromColumnIndex });
 		},

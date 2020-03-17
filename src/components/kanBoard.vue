@@ -1,26 +1,20 @@
 <template>
 	<div>
 		<div class="mb-4 flex flex-start">
-			<input
-				class="add-column-input focus:outline-none"
-				placeholder="+ Nueva Columna"
-				ref="new-column-input hover:"
-				@keyup.enter="addNewColumn"
-				v-model="newColumnName"
-			>
+			<slot name="newColumn" :addNewColumn="addNewColumn"></slot>
 		</div>
 		<div class="board-container">
 			<div
 				draggable
 				class="column-item"
-				v-for="(column, indexColumn) in columns"
+				v-for="(column, indexColumn) in value"
 				:key="indexColumn"
 				@dragstart="moveColumn($event, indexColumn)"
 				@drop="dropColumn($event, indexColumn)"
 				@dragenter.prevent
 				@dragover.prevent
 			>
-				<slot :column="column" :indexColumn="indexColumn"></slot>
+				<slot name="column" :column="column" :indexColumn="indexColumn"></slot>
 			</div>
 			<div class="modal-task-container" v-if="isTask" @click.self="closeTask">
 				<router-view name="taskDetail"/>
@@ -40,23 +34,27 @@ function moveColumn(e, indexColumn) {
 function dropColumn(e, toIndexColumn) {
 	const type = e.dataTransfer.getData('type');
 	if (type === 'column') {
-		const fromIndexColumn = e.dataTransfer.getData('from-column-index');
-		this.$store.dispatch('dropColumnAction', {
-			columns: this.columns,
-			fromIndexColumn,
-			toIndexColumn,
-		});
+		this.updateColumns(e, toIndexColumn);
 	} else {
-		const fromIndexTask = e.dataTransfer.getData('from-task-index');
-		const fromIndexColumn = e.dataTransfer.getData('from-column-index');
-		const toTasks = this.columns[toIndexColumn].tasks;
-		this.$store.dispatch('firstTask', {
-			fromIndexColumn,
-			fromIndexTask,
-			toIndexColumn,
-			toTasks,
-		});
+		this.updateTasks(e, toIndexColumn);
 	}
+}
+
+function updateTasks(e, toIndexColumn) {
+	const fromIndexTask = e.dataTransfer.getData('from-task-index');
+	const fromIndexColumn = e.dataTransfer.getData('from-column-index');
+	const toTasks = this.value[toIndexColumn].tasks;
+	const { tasks } = this.value[fromIndexColumn];
+	const task = tasks.splice(fromIndexTask, 1)[0];
+	toTasks.push(task);
+	this.emitColumns(this.value);
+}
+
+function updateColumns(e, toIndexColumn) {
+	const fromIndexColumn = e.dataTransfer.getData('from-column-index');
+	const column = this.value.splice(fromIndexColumn, 1)[0];
+	this.value.splice(toIndexColumn, 0, column);
+	this.emitColumns(this.value);
 }
 
 function isTask() {
@@ -67,15 +65,12 @@ function closeTask() {
 	this.$router.push({ name: 'app' });
 }
 
-function addNewColumn() {
-	this.$store.dispatch('addNewColumn', { name: this.newColumnName });
-	this.newColumnName = '';
+function addNewColumn(newColumn) {
+	this.emitColumns(this.value.concat(newColumn));
 }
 
-function data() {
-	return {
-		newColumnName: '',
-	};
+function emitColumns(columns) {
+	this.$emit('input', columns);
 }
 
 export default {
@@ -83,18 +78,17 @@ export default {
 	computed: {
 		isTask,
 	},
-	data,
 	methods: {
 		addNewColumn,
 		closeTask,
-		moveColumn,
 		dropColumn,
+		emitColumns,
+		moveColumn,
+		updateColumns,
+		updateTasks,
 	},
 	props: {
-		columns: {
-			type: Array,
-			required: true,
-		},
+		value: null,
 	},
 };
 </script>
@@ -112,16 +106,5 @@ export default {
 	height: max-content;
 	min-width: 31rem;
 	@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;
-}
-
-.add-column-input {
-	@apply  bg-blue-600 border-0 p-2 px-4 py-4 text-white rounded-lg mx-4;
-}
-
-.add-column-input::placeholder {
-	@apply text-white;
-}
-.add-column-input:hover {
-	filter: brightness(1.1);
 }
 </style>

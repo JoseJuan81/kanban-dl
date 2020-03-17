@@ -623,6 +623,7 @@ if (typeof window !== 'undefined') {
 if (GlobalVue) {
 	GlobalVue.use(plugin);
 }
-// export default { kanBoard, kanColumn };
+var wrapper = { kanBoard: __vue_component__$1, kanColumn: __vue_component__ };
 
+export default wrapper;
 export { install, __vue_component__$1 as kanBoard, __vue_component__ as kanColumn };
