@@ -3,7 +3,7 @@
 		<input
 			class="add-task-input focus:outline-none text-3xl"
 			type="text"
-			v-model="column.name"
+			v-model="column[columnTitle]"
 			@keyup.enter="updateColumnName"
 		/>
 		<div
@@ -65,9 +65,9 @@ function updateTasks(tasks, indexColumn) {
 }
 
 function updateColumnName() {
-	this.$store.dispatch('updateColumnAction', {
-		indexColumn: this.indexColumn,
-		name: this.column.name,
+	this.$emit('update-columns', {
+		column: this.column,
+		indexColumn: this.column,
 	});
 }
 
@@ -97,20 +97,18 @@ export default {
 			type: Array,
 			required: true,
 		},
-		indexColumn: {
-			type: Number,
+		columnTitle: {
+			type: String,
 			required: true,
 		},
 		defaultTask: {
 			type: Object,
 			required: true,
 		},
+		indexColumn: {
+			type: Number,
+			required: true,
+		},
 	},
 };
 </script>
-<style lang="scss" scoped>
-.add-task-input {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	@apply w-full bg-transparent border-0 font-medium;
-}
-</style>

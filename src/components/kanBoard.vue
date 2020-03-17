@@ -87,19 +87,3 @@ export default {
 	},
 };
 </script>
-<style lang="scss" scoped>
-.board-container {
-	@apply flex overflow-x-auto h-full;
-}
-
-.modal-task-container {
-	background-color: #2d3748b3;
-	@apply absolute top-0 left-0 w-screen h-screen z-10;
-}
-
-.column-item {
-	height: max-content;
-	min-width: 31rem;
-	@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;
-}
-</style>

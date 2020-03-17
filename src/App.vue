@@ -8,16 +8,18 @@
 				v-model="newColumnName"
 			>
 		</div>
-		<KanBoard :columns="columns" @update-columns="updateColumns">
+		<KanBoard :columns="columns" @update-columns="updateColumns" class="board">
 			<template v-slot:column="{ column, indexColumn }">
 				<KanColumn
 					class="column"
+					column-title="name"
 					:column="column"
 					:columns="columns"
 					:index-column="indexColumn"
 					:default-task="{}"
 					@new-task="updateTasks"
 					@update-tasks="updateTasks"
+					@update-column-name="updateColumnName"
 				>
 					<template v-slot:task="{ task }">
 						<KanTask
@@ -57,6 +59,10 @@ function updateTasks({ tasks, indexColumn }) {
 	this.updateColumns(this.columns);
 }
 
+function updateColumnName(column, indexColumn) {
+	this.$set(this.columns, indexColumn, column);
+}
+
 function data() {
 	return {
 		columns: this.$store.state.board.columns,
@@ -76,6 +82,7 @@ export default {
 	methods: {
 		addNewColumnAction,
 		updateColumns,
+		updateColumnName,
 		updateTasks,
 	},
 };
@@ -99,6 +106,32 @@ html, body {
 	margin: auto;
 	max-width: 144rem;
 	@apply text-xl font-semibold pt-10 px-10 h-screen;
+}
+
+.board {
+	.board-container {
+		@apply flex overflow-x-auto h-full;
+
+		.column-item {
+			height: max-content;
+			min-width: 31rem;
+			@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;
+		}
+	}
+
+	.modal-task-container {
+		background-color: #2d3748b3;
+		@apply absolute top-0 left-0 w-screen h-screen z-10;
+	}
+}
+
+.column {
+	&.column-item-container {
+		.add-task-input {
+			font-family: Avenir, Helvetica, Arial, sans-serif;
+			@apply w-full bg-transparent border-0 font-medium;
+		}
+	}
 }
 
 .task {
