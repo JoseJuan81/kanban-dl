@@ -43,11 +43,12 @@
 	}
 
 	function addTask() {
-		this.$store.dispatch('addNewTask', {
-			name: this.newTask,
-			tasks: this.column.tasks,
+		var task = Object.assign(this.defaultTask, { name: this.newTaskName });
+		this.$emit('new-task', {
+			tasks: this.column.tasks.concat(task),
+			indexColumn: this.indexColumn,
 		});
-		this.newTask = '';
+		this.newTaskName = '';
 	}
 
 	function moveTask(e, fromTaskIndex) {
@@ -60,12 +61,15 @@
 
 	function dropTask(e, toTasks, toTaskIndex) {
 		var fromTaskIndex = e.dataTransfer.getData('from-task-index');
-		this.$store.dispatch('dropTaskAction', {
-			fromTaskIndex: fromTaskIndex,
-			fromColumnIndex: this.indexColumn,
-			toTaskIndex: toTaskIndex,
-			toTasks: toTasks,
-		});
+		var fromColumnIndex = e.dataTransfer.getData('from-column-index');
+		var fromTasks = this.columns[fromColumnIndex].tasks;
+		var task = fromTasks.splice(fromTaskIndex, 1)[0];
+		toTasks.splice(toTaskIndex, 0, task);
+		this.updateTasks(toTasks, this.indexColumn);
+	}
+
+	function updateTasks(tasks, indexColumn) {
+		this.$emit('update-tasks', { tasks: tasks, indexColumn: indexColumn });
 	}
 
 	function updateColumnName() {
@@ -77,7 +81,7 @@
 
 	function data() {
 		return {
-			newTask: '',
+			newTaskName: '',
 		};
 	}
 
@@ -90,14 +94,23 @@
 			moveTask: moveTask,
 			showTask: showTask,
 			updateColumnName: updateColumnName,
+			updateTasks: updateTasks,
 		},
 		props: {
 			column: {
 				type: Object,
 				required: true,
 			},
+			columns: {
+				type: Array,
+				required: true,
+			},
 			indexColumn: {
 				type: Number,
+				required: true,
+			},
+			defaultTask: {
+				type: Object,
 				required: true,
 			},
 		},
@@ -300,7 +313,7 @@
 	              }
 	            }
 	          },
-	          [_vm._t("default", null, { task: task })],
+	          [_vm._t("task", null, { task: task })],
 	          2
 	        )
 	      }),
@@ -310,13 +323,13 @@
 	          {
 	            name: "model",
 	            rawName: "v-model",
-	            value: _vm.newTask,
-	            expression: "newTask"
+	            value: _vm.newTaskName,
+	            expression: "newTaskName"
 	          }
 	        ],
 	        staticClass: "add-task-input focus:outline-none",
 	        attrs: { type: "text", name: "add-task", placeholder: "+ nueva tarea" },
-	        domProps: { value: _vm.newTask },
+	        domProps: { value: _vm.newTaskName },
 	        on: {
 	          keyup: function($event) {
 	            if (
@@ -331,7 +344,7 @@
 	            if ($event.target.composing) {
 	              return
 	            }
-	            _vm.newTask = $event.target.value;
+	            _vm.newTaskName = $event.target.value;
 	          }
 	        }
 	      })
@@ -345,11 +358,11 @@
 	  /* style */
 	  var __vue_inject_styles__ = function (inject) {
 	    if (!inject) { return }
-	    inject("data-v-7dc62ed0_0", { source: ".add-task-input[data-v-7dc62ed0] {\n  font-family: Avenir, Helvetica, Arial, sans-serif;\n@apply w-full bg-transparent border-0 font-medium;\n}\n\n/*# sourceMappingURL=kanColumn.vue.map */", map: {"version":3,"sources":["/Users/frontend/Documents/JJ/kanban-dl/src/components/kanColumn.vue","kanColumn.vue"],"names":[],"mappings":"AAkGA;EACA,iDAAA;AACA,iDAAA;ACjGA;;AAEA,wCAAwC","file":"kanColumn.vue","sourcesContent":["<template>\n\t<div class=\"column-item-container\">\n\t\t<input\n\t\t\tclass=\"add-task-input focus:outline-none text-3xl\"\n\t\t\ttype=\"text\"\n\t\t\tv-model=\"column.name\"\n\t\t\t@keyup.enter=\"updateColumnName\"\n\t\t/>\n\t\t<div\n\t\t\tdraggable\n\t\t\tv-for=\"(task, indexTask) in column.tasks\"\n\t\t\t:key=\"indexTask\"\n\t\t\t@click=\"showTask(task)\"\n\t\t\t@dragstart.stop=\"moveTask($event, indexTask)\"\n\t\t\t@drop.stop=\"dropTask($event, column.tasks, indexTask)\"\n\t\t\t@dragenter.prevent\n\t\t\t@dragover.prevent\n\t\t>\n\t\t\t<slot :task=\"task\"/>\n\t\t</div>\n\t\t<input\n\t\t\ttype=\"text\"\n\t\t\tname=\"add-task\"\n\t\t\tclass=\"add-task-input focus:outline-none\"\n\t\t\tplaceholder=\"+ nueva tarea\"\n\t\t\tv-model=\"newTask\"\n\t\t\t@keyup.enter=\"addTask\"\n\t\t/>\n\t</div>\n</template>\n<script>\n\nfunction showTask({ id }) {\n\tthis.$router.push({ name: 'kan-task-detail', params: { id } });\n}\n\nfunction addTask() {\n\tthis.$store.dispatch('addNewTask', {\n\t\tname: this.newTask,\n\t\ttasks: this.column.tasks,\n\t});\n\tthis.newTask = '';\n}\n\nfunction moveTask(e, fromTaskIndex) {\n\te.dataTransfer.effectAllowed = 'move';\n\te.dataTransfer.dropEffect = 'move';\n\te.dataTransfer.setData('from-task-index', fromTaskIndex);\n\te.dataTransfer.setData('from-column-index', this.indexColumn);\n\te.dataTransfer.setData('type', 'task');\n}\n\nfunction dropTask(e, toTasks, toTaskIndex) {\n\tconst fromTaskIndex = e.dataTransfer.getData('from-task-index');\n\tthis.$store.dispatch('dropTaskAction', {\n\t\tfromTaskIndex,\n\t\tfromColumnIndex: this.indexColumn,\n\t\ttoTaskIndex,\n\t\ttoTasks,\n\t});\n}\n\nfunction updateColumnName() {\n\tthis.$store.dispatch('updateColumnAction', {\n\t\tindexColumn: this.indexColumn,\n\t\tname: this.column.name,\n\t});\n}\n\nfunction data() {\n\treturn {\n\t\tnewTask: '',\n\t};\n}\n\nexport default {\n\tname: 'kan-column',\n\tdata,\n\tmethods: {\n\t\taddTask,\n\t\tdropTask,\n\t\tmoveTask,\n\t\tshowTask,\n\t\tupdateColumnName,\n\t},\n\tprops: {\n\t\tcolumn: {\n\t\t\ttype: Object,\n\t\t\trequired: true,\n\t\t},\n\t\tindexColumn: {\n\t\t\ttype: Number,\n\t\t\trequired: true,\n\t\t},\n\t},\n};\n</script>\n<style lang=\"scss\" scoped>\n.add-task-input {\n\tfont-family: Avenir, Helvetica, Arial, sans-serif;\n\t@apply w-full bg-transparent border-0 font-medium;\n}\n</style>\n",".add-task-input {\n  font-family: Avenir, Helvetica, Arial, sans-serif;\n  @apply w-full bg-transparent border-0 font-medium;\n}\n\n/*# sourceMappingURL=kanColumn.vue.map */"]}, media: undefined });
+	    inject("data-v-1939ddb4_0", { source: ".add-task-input[data-v-1939ddb4] {\n  font-family: Avenir, Helvetica, Arial, sans-serif;\n@apply w-full bg-transparent border-0 font-medium;\n}\n\n/*# sourceMappingURL=kanColumn.vue.map */", map: {"version":3,"sources":["/Users/frontend/Documents/JJ/kanban-dl/src/components/kanColumn.vue","kanColumn.vue"],"names":[],"mappings":"AA+GA;EACA,iDAAA;AACA,iDAAA;AC9GA;;AAEA,wCAAwC","file":"kanColumn.vue","sourcesContent":["<template>\n\t<div class=\"column-item-container\">\n\t\t<input\n\t\t\tclass=\"add-task-input focus:outline-none text-3xl\"\n\t\t\ttype=\"text\"\n\t\t\tv-model=\"column.name\"\n\t\t\t@keyup.enter=\"updateColumnName\"\n\t\t/>\n\t\t<div\n\t\t\tdraggable\n\t\t\tv-for=\"(task, indexTask) in column.tasks\"\n\t\t\t:key=\"indexTask\"\n\t\t\t@click=\"showTask(task)\"\n\t\t\t@dragstart.stop=\"moveTask($event, indexTask)\"\n\t\t\t@drop.stop=\"dropTask($event, column.tasks, indexTask)\"\n\t\t\t@dragenter.prevent\n\t\t\t@dragover.prevent\n\t\t>\n\t\t\t<slot name=\"task\" :task=\"task\"/>\n\t\t</div>\n\t\t<input\n\t\t\ttype=\"text\"\n\t\t\tname=\"add-task\"\n\t\t\tclass=\"add-task-input focus:outline-none\"\n\t\t\tplaceholder=\"+ nueva tarea\"\n\t\t\tv-model=\"newTaskName\"\n\t\t\t@keyup.enter=\"addTask\"\n\t\t/>\n\t</div>\n</template>\n<script>\n\nfunction showTask({ id }) {\n\tthis.$router.push({ name: 'kan-task-detail', params: { id } });\n}\n\nfunction addTask() {\n\tconst task = Object.assign(this.defaultTask, { name: this.newTaskName });\n\tthis.$emit('new-task', {\n\t\ttasks: this.column.tasks.concat(task),\n\t\tindexColumn: this.indexColumn,\n\t});\n\tthis.newTaskName = '';\n}\n\nfunction moveTask(e, fromTaskIndex) {\n\te.dataTransfer.effectAllowed = 'move';\n\te.dataTransfer.dropEffect = 'move';\n\te.dataTransfer.setData('from-task-index', fromTaskIndex);\n\te.dataTransfer.setData('from-column-index', this.indexColumn);\n\te.dataTransfer.setData('type', 'task');\n}\n\nfunction dropTask(e, toTasks, toTaskIndex) {\n\tconst fromTaskIndex = e.dataTransfer.getData('from-task-index');\n\tconst fromColumnIndex = e.dataTransfer.getData('from-column-index');\n\tconst fromTasks = this.columns[fromColumnIndex].tasks;\n\tconst task = fromTasks.splice(fromTaskIndex, 1)[0];\n\ttoTasks.splice(toTaskIndex, 0, task);\n\tthis.updateTasks(toTasks, this.indexColumn);\n}\n\nfunction updateTasks(tasks, indexColumn) {\n\tthis.$emit('update-tasks', { tasks, indexColumn });\n}\n\nfunction updateColumnName() {\n\tthis.$store.dispatch('updateColumnAction', {\n\t\tindexColumn: this.indexColumn,\n\t\tname: this.column.name,\n\t});\n}\n\nfunction data() {\n\treturn {\n\t\tnewTaskName: '',\n\t};\n}\n\nexport default {\n\tname: 'kan-column',\n\tdata,\n\tmethods: {\n\t\taddTask,\n\t\tdropTask,\n\t\tmoveTask,\n\t\tshowTask,\n\t\tupdateColumnName,\n\t\tupdateTasks,\n\t},\n\tprops: {\n\t\tcolumn: {\n\t\t\ttype: Object,\n\t\t\trequired: true,\n\t\t},\n\t\tcolumns: {\n\t\t\ttype: Array,\n\t\t\trequired: true,\n\t\t},\n\t\tindexColumn: {\n\t\t\ttype: Number,\n\t\t\trequired: true,\n\t\t},\n\t\tdefaultTask: {\n\t\t\ttype: Object,\n\t\t\trequired: true,\n\t\t},\n\t},\n};\n</script>\n<style lang=\"scss\" scoped>\n.add-task-input {\n\tfont-family: Avenir, Helvetica, Arial, sans-serif;\n\t@apply w-full bg-transparent border-0 font-medium;\n}\n</style>\n",".add-task-input {\n  font-family: Avenir, Helvetica, Arial, sans-serif;\n  @apply w-full bg-transparent border-0 font-medium;\n}\n\n/*# sourceMappingURL=kanColumn.vue.map */"]}, media: undefined });
 
 	  };
 	  /* scoped */
-	  var __vue_scope_id__ = "data-v-7dc62ed0";
+	  var __vue_scope_id__ = "data-v-1939ddb4";
 	  /* module identifier */
 	  var __vue_module_identifier__ = undefined;
 	  /* functional template */
@@ -394,15 +407,6 @@
 	//
 	//
 	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
 
 
 	function moveColumn(e, indexColumn) {
@@ -415,23 +419,28 @@
 	function dropColumn(e, toIndexColumn) {
 		var type = e.dataTransfer.getData('type');
 		if (type === 'column') {
-			var fromIndexColumn = e.dataTransfer.getData('from-column-index');
-			this.$store.dispatch('dropColumnAction', {
-				columns: this.columns,
-				fromIndexColumn: fromIndexColumn,
-				toIndexColumn: toIndexColumn,
-			});
+			this.updateColumns(e, toIndexColumn);
 		} else {
-			var fromIndexTask = e.dataTransfer.getData('from-task-index');
-			var fromIndexColumn$1 = e.dataTransfer.getData('from-column-index');
-			var toTasks = this.columns[toIndexColumn].tasks;
-			this.$store.dispatch('firstTask', {
-				fromIndexColumn: fromIndexColumn$1,
-				fromIndexTask: fromIndexTask,
-				toIndexColumn: toIndexColumn,
-				toTasks: toTasks,
-			});
+			this.updateTasks(e, toIndexColumn);
 		}
+	}
+
+	function updateTasks$1(e, toIndexColumn) {
+		var fromIndexTask = e.dataTransfer.getData('from-task-index');
+		var fromIndexColumn = e.dataTransfer.getData('from-column-index');
+		var toTasks = this.columns[toIndexColumn].tasks;
+		var ref = this.columns[fromIndexColumn];
+		var tasks = ref.tasks;
+		var task = tasks.splice(fromIndexTask, 1)[0];
+		toTasks.push(task);
+		this.emitColumns(this.columns);
+	}
+
+	function updateColumns(e, toIndexColumn) {
+		var fromIndexColumn = e.dataTransfer.getData('from-column-index');
+		var column = this.columns.splice(fromIndexColumn, 1)[0];
+		this.columns.splice(toIndexColumn, 0, column);
+		this.emitColumns(this.columns);
 	}
 
 	function isTask() {
@@ -442,15 +451,8 @@
 		this.$router.push({ name: 'app' });
 	}
 
-	function addNewColumn() {
-		this.$store.dispatch('addNewColumn', { name: this.newColumnName });
-		this.newColumnName = '';
-	}
-
-	function data$1() {
-		return {
-			newColumnName: '',
-		};
+	function emitColumns(columns) {
+		this.$emit('update-columns', columns);
 	}
 
 	var script$1 = {
@@ -458,12 +460,13 @@
 		computed: {
 			isTask: isTask,
 		},
-		data: data$1,
 		methods: {
-			addNewColumn: addNewColumn,
 			closeTask: closeTask,
-			moveColumn: moveColumn,
 			dropColumn: dropColumn,
+			emitColumns: emitColumns,
+			moveColumn: moveColumn,
+			updateColumns: updateColumns,
+			updateTasks: updateTasks$1,
 		},
 		props: {
 			columns: {
@@ -482,40 +485,6 @@
 	  var _h = _vm.$createElement;
 	  var _c = _vm._self._c || _h;
 	  return _c("div", [
-	    _c("div", { staticClass: "mb-4 flex flex-start" }, [
-	      _c("input", {
-	        directives: [
-	          {
-	            name: "model",
-	            rawName: "v-model",
-	            value: _vm.newColumnName,
-	            expression: "newColumnName"
-	          }
-	        ],
-	        ref: "new-column-input hover:",
-	        staticClass: "add-column-input focus:outline-none",
-	        attrs: { placeholder: "+ Nueva Columna" },
-	        domProps: { value: _vm.newColumnName },
-	        on: {
-	          keyup: function($event) {
-	            if (
-	              !$event.type.indexOf("key") &&
-	              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-	            ) {
-	              return null
-	            }
-	            return _vm.addNewColumn($event)
-	          },
-	          input: function($event) {
-	            if ($event.target.composing) {
-	              return
-	            }
-	            _vm.newColumnName = $event.target.value;
-	          }
-	        }
-	      })
-	    ]),
-	    _vm._v(" "),
 	    _c(
 	      "div",
 	      { staticClass: "board-container" },
@@ -543,7 +512,7 @@
 	              }
 	            },
 	            [
-	              _vm._t("default", null, {
+	              _vm._t("column", null, {
 	                column: column,
 	                indexColumn: indexColumn
 	              })
@@ -581,11 +550,11 @@
 	  /* style */
 	  var __vue_inject_styles__$1 = function (inject) {
 	    if (!inject) { return }
-	    inject("data-v-4921a3eb_0", { source: ".board-container[data-v-4921a3eb] {\n@apply flex overflow-x-auto h-full;\n}\n.modal-task-container[data-v-4921a3eb] {\n  background-color: #2d3748b3;\n@apply absolute top-0 left-0 w-screen h-screen z-10;\n}\n.column-item[data-v-4921a3eb] {\n  height: max-content;\n  min-width: 31rem;\n@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;\n}\n.add-column-input[data-v-4921a3eb] {\n@apply bg-blue-600 border-0 p-2 px-4 py-4 text-white rounded-lg mx-4;\n}\n.add-column-input[data-v-4921a3eb]::placeholder {\n@apply text-white;\n}\n.add-column-input[data-v-4921a3eb]:hover {\n  filter: brightness(1.1);\n}\n\n/*# sourceMappingURL=kanBoard.vue.map */", map: {"version":3,"sources":["/Users/frontend/Documents/JJ/kanban-dl/src/components/kanBoard.vue","kanBoard.vue"],"names":[],"mappings":"AAqGA;AACA,kCAAA;ACpGA;ADuGA;EACA,2BAAA;AACA,mDAAA;ACpGA;ADuGA;EACA,mBAAA;EACA,gBAAA;AACA,yDAAA;ACpGA;ADuGA;AACA,oEAAA;ACpGA;ADuGA;AACA,iBAAA;ACpGA;ADsGA;EACA,uBAAA;ACnGA;;AAEA,uCAAuC","file":"kanBoard.vue","sourcesContent":["<template>\n\t<div>\n\t\t<div class=\"mb-4 flex flex-start\">\n\t\t\t<input\n\t\t\t\tclass=\"add-column-input focus:outline-none\"\n\t\t\t\tplaceholder=\"+ Nueva Columna\"\n\t\t\t\tref=\"new-column-input hover:\"\n\t\t\t\t@keyup.enter=\"addNewColumn\"\n\t\t\t\tv-model=\"newColumnName\"\n\t\t\t>\n\t\t</div>\n\t\t<div class=\"board-container\">\n\t\t\t<div\n\t\t\t\tdraggable\n\t\t\t\tclass=\"column-item\"\n\t\t\t\tv-for=\"(column, indexColumn) in columns\"\n\t\t\t\t:key=\"indexColumn\"\n\t\t\t\t@dragstart=\"moveColumn($event, indexColumn)\"\n\t\t\t\t@drop=\"dropColumn($event, indexColumn)\"\n\t\t\t\t@dragenter.prevent\n\t\t\t\t@dragover.prevent\n\t\t\t>\n\t\t\t\t<slot :column=\"column\" :indexColumn=\"indexColumn\"></slot>\n\t\t\t</div>\n\t\t\t<div class=\"modal-task-container\" v-if=\"isTask\" @click.self=\"closeTask\">\n\t\t\t\t<router-view name=\"taskDetail\"/>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n<script>\n\nfunction moveColumn(e, indexColumn) {\n\te.dataTransfer.effectAllowed = 'move';\n\te.dataTransfer.dropEffect = 'move';\n\te.dataTransfer.setData('from-column-index', JSON.stringify(indexColumn));\n\te.dataTransfer.setData('type', 'column');\n}\n\nfunction dropColumn(e, toIndexColumn) {\n\tconst type = e.dataTransfer.getData('type');\n\tif (type === 'column') {\n\t\tconst fromIndexColumn = e.dataTransfer.getData('from-column-index');\n\t\tthis.$store.dispatch('dropColumnAction', {\n\t\t\tcolumns: this.columns,\n\t\t\tfromIndexColumn,\n\t\t\ttoIndexColumn,\n\t\t});\n\t} else {\n\t\tconst fromIndexTask = e.dataTransfer.getData('from-task-index');\n\t\tconst fromIndexColumn = e.dataTransfer.getData('from-column-index');\n\t\tconst toTasks = this.columns[toIndexColumn].tasks;\n\t\tthis.$store.dispatch('firstTask', {\n\t\t\tfromIndexColumn,\n\t\t\tfromIndexTask,\n\t\t\ttoIndexColumn,\n\t\t\ttoTasks,\n\t\t});\n\t}\n}\n\nfunction isTask() {\n\treturn this.$route.name === 'kan-task-detail';\n}\n\nfunction closeTask() {\n\tthis.$router.push({ name: 'app' });\n}\n\nfunction addNewColumn() {\n\tthis.$store.dispatch('addNewColumn', { name: this.newColumnName });\n\tthis.newColumnName = '';\n}\n\nfunction data() {\n\treturn {\n\t\tnewColumnName: '',\n\t};\n}\n\nexport default {\n\tname: 'kan-board',\n\tcomputed: {\n\t\tisTask,\n\t},\n\tdata,\n\tmethods: {\n\t\taddNewColumn,\n\t\tcloseTask,\n\t\tmoveColumn,\n\t\tdropColumn,\n\t},\n\tprops: {\n\t\tcolumns: {\n\t\t\ttype: Array,\n\t\t\trequired: true,\n\t\t},\n\t},\n};\n</script>\n<style lang=\"scss\" scoped>\n.board-container {\n\t@apply flex overflow-x-auto h-full;\n}\n\n.modal-task-container {\n\tbackground-color: #2d3748b3;\n\t@apply absolute top-0 left-0 w-screen h-screen z-10;\n}\n\n.column-item {\n\theight: max-content;\n\tmin-width: 31rem;\n\t@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;\n}\n\n.add-column-input {\n\t@apply  bg-blue-600 border-0 p-2 px-4 py-4 text-white rounded-lg mx-4;\n}\n\n.add-column-input::placeholder {\n\t@apply text-white;\n}\n.add-column-input:hover {\n\tfilter: brightness(1.1);\n}\n</style>\n",".board-container {\n  @apply flex overflow-x-auto h-full;\n}\n\n.modal-task-container {\n  background-color: #2d3748b3;\n  @apply absolute top-0 left-0 w-screen h-screen z-10;\n}\n\n.column-item {\n  height: max-content;\n  min-width: 31rem;\n  @apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;\n}\n\n.add-column-input {\n  @apply bg-blue-600 border-0 p-2 px-4 py-4 text-white rounded-lg mx-4;\n}\n\n.add-column-input::placeholder {\n  @apply text-white;\n}\n\n.add-column-input:hover {\n  filter: brightness(1.1);\n}\n\n/*# sourceMappingURL=kanBoard.vue.map */"]}, media: undefined });
+	    inject("data-v-69e67541_0", { source: ".board-container[data-v-69e67541] {\n@apply flex overflow-x-auto h-full;\n}\n.modal-task-container[data-v-69e67541] {\n  background-color: #2d3748b3;\n@apply absolute top-0 left-0 w-screen h-screen z-10;\n}\n.column-item[data-v-69e67541] {\n  height: max-content;\n  min-width: 31rem;\n@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;\n}\n\n/*# sourceMappingURL=kanBoard.vue.map */", map: {"version":3,"sources":["/Users/frontend/Documents/JJ/kanban-dl/src/components/kanBoard.vue","kanBoard.vue"],"names":[],"mappings":"AA0FA;AACA,kCAAA;ACzFA;AD4FA;EACA,2BAAA;AACA,mDAAA;ACzFA;AD4FA;EACA,mBAAA;EACA,gBAAA;AACA,yDAAA;ACzFA;;AAEA,uCAAuC","file":"kanBoard.vue","sourcesContent":["<template>\n\t<div>\n\t\t<div class=\"board-container\">\n\t\t\t<div\n\t\t\t\tdraggable\n\t\t\t\tclass=\"column-item\"\n\t\t\t\tv-for=\"(column, indexColumn) in columns\"\n\t\t\t\t:key=\"indexColumn\"\n\t\t\t\t@dragstart=\"moveColumn($event, indexColumn)\"\n\t\t\t\t@drop=\"dropColumn($event, indexColumn)\"\n\t\t\t\t@dragenter.prevent\n\t\t\t\t@dragover.prevent\n\t\t\t>\n\t\t\t\t<slot name=\"column\" :column=\"column\" :indexColumn=\"indexColumn\"></slot>\n\t\t\t</div>\n\t\t\t<div class=\"modal-task-container\" v-if=\"isTask\" @click.self=\"closeTask\">\n\t\t\t\t<router-view name=\"taskDetail\"/>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n<script>\n\nfunction moveColumn(e, indexColumn) {\n\te.dataTransfer.effectAllowed = 'move';\n\te.dataTransfer.dropEffect = 'move';\n\te.dataTransfer.setData('from-column-index', JSON.stringify(indexColumn));\n\te.dataTransfer.setData('type', 'column');\n}\n\nfunction dropColumn(e, toIndexColumn) {\n\tconst type = e.dataTransfer.getData('type');\n\tif (type === 'column') {\n\t\tthis.updateColumns(e, toIndexColumn);\n\t} else {\n\t\tthis.updateTasks(e, toIndexColumn);\n\t}\n}\n\nfunction updateTasks(e, toIndexColumn) {\n\tconst fromIndexTask = e.dataTransfer.getData('from-task-index');\n\tconst fromIndexColumn = e.dataTransfer.getData('from-column-index');\n\tconst toTasks = this.columns[toIndexColumn].tasks;\n\tconst { tasks } = this.columns[fromIndexColumn];\n\tconst task = tasks.splice(fromIndexTask, 1)[0];\n\ttoTasks.push(task);\n\tthis.emitColumns(this.columns);\n}\n\nfunction updateColumns(e, toIndexColumn) {\n\tconst fromIndexColumn = e.dataTransfer.getData('from-column-index');\n\tconst column = this.columns.splice(fromIndexColumn, 1)[0];\n\tthis.columns.splice(toIndexColumn, 0, column);\n\tthis.emitColumns(this.columns);\n}\n\nfunction isTask() {\n\treturn this.$route.name === 'kan-task-detail';\n}\n\nfunction closeTask() {\n\tthis.$router.push({ name: 'app' });\n}\n\nfunction emitColumns(columns) {\n\tthis.$emit('update-columns', columns);\n}\n\nexport default {\n\tname: 'kan-board',\n\tcomputed: {\n\t\tisTask,\n\t},\n\tmethods: {\n\t\tcloseTask,\n\t\tdropColumn,\n\t\temitColumns,\n\t\tmoveColumn,\n\t\tupdateColumns,\n\t\tupdateTasks,\n\t},\n\tprops: {\n\t\tcolumns: {\n\t\t\ttype: Array,\n\t\t\trequired: true,\n\t\t},\n\t},\n};\n</script>\n<style lang=\"scss\" scoped>\n.board-container {\n\t@apply flex overflow-x-auto h-full;\n}\n\n.modal-task-container {\n\tbackground-color: #2d3748b3;\n\t@apply absolute top-0 left-0 w-screen h-screen z-10;\n}\n\n.column-item {\n\theight: max-content;\n\tmin-width: 31rem;\n\t@apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;\n}\n</style>\n",".board-container {\n  @apply flex overflow-x-auto h-full;\n}\n\n.modal-task-container {\n  background-color: #2d3748b3;\n  @apply absolute top-0 left-0 w-screen h-screen z-10;\n}\n\n.column-item {\n  height: max-content;\n  min-width: 31rem;\n  @apply bg-gray-300 p-6 mx-4 text-left rounded-lg text-3xl;\n}\n\n/*# sourceMappingURL=kanBoard.vue.map */"]}, media: undefined });
 
 	  };
 	  /* scoped */
-	  var __vue_scope_id__$1 = "data-v-4921a3eb";
+	  var __vue_scope_id__$1 = "data-v-69e67541";
 	  /* module identifier */
 	  var __vue_module_identifier__$1 = undefined;
 	  /* functional template */
