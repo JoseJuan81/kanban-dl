@@ -8,17 +8,36 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 
 function task() {
-	return this.getTask(this.$route.params.id);
+	const { name } = this.$route.params;
+	const parseName = name.split('-').join(' ');
+	const { columns } = this.$store.state.board;
+	const currentTask = this.recursiveSearch(parseName, columns);
+	return currentTask;
+}
+
+function recursiveSearch(name, columns) {
+	const len = columns.length;
+	for (let i = 0; i < len; i += 1) {
+		const { tasks } = columns[i];
+		const taskLen = tasks.length;
+		for (let j = 0; j < taskLen; j += 1) {
+			if (tasks[j].name === name) {
+				return tasks[j];
+			}
+		}
+	}
+	return false;
 }
 
 export default {
 	name: 'task',
 	computed: {
-		...mapGetters(['getTask']),
 		task,
+	},
+	methods: {
+		recursiveSearch,
 	},
 };
 </script>

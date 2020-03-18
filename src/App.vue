@@ -20,6 +20,7 @@
 					@new-task="updateTasks"
 					@update-tasks="updateTasks"
 					@update-column-name="updateColumnName"
+					@show-task="showTask"
 				>
 					<template v-slot:task="{ task }">
 						<KanTask
@@ -63,6 +64,11 @@ function updateColumnName(column, indexColumn) {
 	this.$set(this.columns, indexColumn, column);
 }
 
+function showTask(task) {
+	const name = task.name.split(' ').join('-');
+	this.$router.push({ name: 'kan-task-detail', params: { name } });
+}
+
 function data() {
 	return {
 		columns: this.$store.state.board.columns,
@@ -81,6 +87,7 @@ export default {
 	data,
 	methods: {
 		addNewColumnAction,
+		showTask,
 		updateColumns,
 		updateColumnName,
 		updateTasks,

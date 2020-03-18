@@ -30,8 +30,8 @@
 </template>
 <script>
 
-function showTask({ id }) {
-	this.$router.push({ name: 'kan-task-detail', params: { id } });
+function showTask(task) {
+	this.$emit('show-task', task);
 }
 
 function addTask() {
