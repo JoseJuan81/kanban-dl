@@ -19,6 +19,7 @@
 			<slot name="task" :task="task"/>
 		</div>
 		<input
+			v-if="addTaskField"
 			type="text"
 			name="add-task"
 			class="add-task-input focus:outline-none"
@@ -108,6 +109,10 @@ export default {
 		indexColumn: {
 			type: Number,
 			required: true,
+		},
+		addTaskField: {
+			type: Boolean,
+			default: true,
 		},
 	},
 };
