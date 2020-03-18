@@ -30,10 +30,8 @@
 //
 
 
-function showTask(ref) {
-	var id = ref.id;
-
-	this.$router.push({ name: 'kan-task-detail', params: { id: id } });
+function showTask(task) {
+	this.$emit('show-task', task);
 }
 
 function addTask() {
@@ -387,7 +385,7 @@ function updateColumns(e, toIndexColumn) {
 }
 
 function isTask() {
-	return this.$route.name === 'kan-task-detail';
+	return this.$route.name === this.taskPageName;
 }
 
 function closeTask() {
@@ -414,6 +412,10 @@ var script$1 = {
 	props: {
 		columns: {
 			type: Array,
+			required: true,
+		},
+		taskPageName: {
+			type: String,
 			required: true,
 		},
 	},
