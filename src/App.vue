@@ -8,7 +8,12 @@
 				v-model="newColumnName"
 			>
 		</div>
-		<KanBoard :columns="columns" @update-columns="updateColumns" class="board">
+		<KanBoard
+			class="board"
+			task-page-name="kan-task-detail"
+			:columns="columns"
+			@update-columns="updateColumns"
+		>
 			<template v-slot:column="{ column, indexColumn }">
 				<KanColumn
 					class="column"

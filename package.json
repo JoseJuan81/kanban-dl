@@ -1,6 +1,6 @@
 {
   "name": "kanban-board-dl",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": "build/kanban-board-dl.umd.js",
   "module": "build/kanban-board-dl.esm.js",
   "unpkg": "build/kanban-board-dl.min.js",

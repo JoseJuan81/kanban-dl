@@ -55,7 +55,7 @@ function updateColumns(e, toIndexColumn) {
 }
 
 function isTask() {
-	return this.$route.name === 'kan-task-detail';
+	return this.$route.name === this.taskPageName;
 }
 
 function closeTask() {
@@ -82,6 +82,10 @@ export default {
 	props: {
 		columns: {
 			type: Array,
+			required: true,
+		},
+		taskPageName: {
+			type: String,
 			required: true,
 		},
 	},
