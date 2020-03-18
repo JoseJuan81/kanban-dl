@@ -34,6 +34,7 @@
 	//
 	//
 	//
+	//
 
 
 	function showTask(task) {
@@ -114,6 +115,10 @@
 			indexColumn: {
 				type: Number,
 				required: true,
+			},
+			addTaskField: {
+				type: Boolean,
+				default: true,
 			},
 		},
 	};
@@ -267,36 +272,42 @@
 	        )
 	      }),
 	      _vm._v(" "),
-	      _c("input", {
-	        directives: [
-	          {
-	            name: "model",
-	            rawName: "v-model",
-	            value: _vm.newTaskName,
-	            expression: "newTaskName"
-	          }
-	        ],
-	        staticClass: "add-task-input focus:outline-none",
-	        attrs: { type: "text", name: "add-task", placeholder: "+ nueva tarea" },
-	        domProps: { value: _vm.newTaskName },
-	        on: {
-	          keyup: function($event) {
-	            if (
-	              !$event.type.indexOf("key") &&
-	              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-	            ) {
-	              return null
+	      _vm.addTaskField
+	        ? _c("input", {
+	            directives: [
+	              {
+	                name: "model",
+	                rawName: "v-model",
+	                value: _vm.newTaskName,
+	                expression: "newTaskName"
+	              }
+	            ],
+	            staticClass: "add-task-input focus:outline-none",
+	            attrs: {
+	              type: "text",
+	              name: "add-task",
+	              placeholder: "+ nueva tarea"
+	            },
+	            domProps: { value: _vm.newTaskName },
+	            on: {
+	              keyup: function($event) {
+	                if (
+	                  !$event.type.indexOf("key") &&
+	                  _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+	                ) {
+	                  return null
+	                }
+	                return _vm.addTask($event)
+	              },
+	              input: function($event) {
+	                if ($event.target.composing) {
+	                  return
+	                }
+	                _vm.newTaskName = $event.target.value;
+	              }
 	            }
-	            return _vm.addTask($event)
-	          },
-	          input: function($event) {
-	            if ($event.target.composing) {
-	              return
-	            }
-	            _vm.newTaskName = $event.target.value;
-	          }
-	        }
-	      })
+	          })
+	        : _vm._e()
 	    ],
 	    2
 	  )
